@@ -2,7 +2,6 @@ public class ProcessImage
 {
     private PCB Pcb_data;
     private String code; //CPU_IO_Sequence
-    private int nextBurstPosition;
     private int positionCounter; //Position in array
     private int[] burstData;
 
@@ -11,9 +10,6 @@ public class ProcessImage
         positionCounter = 0;
         setCode(process);
         constructData();
-
-        //set PCB data, code and others
-        //set state as "NEW";
     }
 
     private void constructData()
@@ -35,7 +31,6 @@ public class ProcessImage
         setPcb_data(new PCB("NEW", id, priority, arrivalOrder));
     }
 
-
     public int getRegisterValue()
     {
         return getPcb_data().getPositionOfNextInstruction();
@@ -45,7 +40,6 @@ public class ProcessImage
     {
         getPcb_data().setPositionOfNextInstruction(valueRemaining);
     }
-
 
     public int getBurstValue()
     {
@@ -72,7 +66,6 @@ public class ProcessImage
         else
             return false;
     }
-
 
     public void setState(String state)
     {
