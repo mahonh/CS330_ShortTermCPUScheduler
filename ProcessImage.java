@@ -28,7 +28,7 @@ public class ProcessImage
         int[] temp = new int[burstSequence.length()];
 
         for (int i = 0; i < burstSequence.length(); i++)
-            temp[i] = burstSequence.charAt(i);
+            temp[i] = Character.getNumericValue(burstSequence.charAt(i));
 
         setBurstData(temp);
 
@@ -67,7 +67,7 @@ public class ProcessImage
 
     public boolean isFinalCPUBurst()
     {
-        if (positionCounter == totalBurst())
+        if ((positionCounter + 1) >= totalBurst())
             return true;
         else
             return false;
