@@ -210,23 +210,23 @@ public class OS
 
     }
 
-//    class PriorityChecker implements Comparator<Process>
-//    {
-//        @Override
-//        public int compare(Process o1, Process o2) {
-//            if (o1.getPriority() < o2.getPriority())
-//                return 1;
-//            else if (o1.getPriority() > o2.getPriority())
-//                return -1;
-//            else
-//                return 0;
-//        }
-//    }
+    class ArrivalPriorityChecker implements Comparator<Process>
+    {
+        @Override
+        public int compare(Process o1, Process o2) {
+            if (o1.getArrivalOrder() < o2.getArrivalOrder())
+                return -1;
+            else if (o1.getArrivalOrder() > o2.getArrivalOrder())
+                return 1;
+            else
+                return 0;
+        }
+    }
 
     private void algorithm_SP()
     {
-//        Comparator<Process> priorityRanker = new PriorityChecker();
-//        PriorityQueue<Process> tempReady = new PriorityQueue<Process>(Ready_Queue.size(), priorityRanker);
+        Comparator<Process> priorityRanker = new ArrivalPriorityChecker();
+        PriorityQueue<Process> tempReady = new PriorityQueue<Process>(Ready_Queue.size(), priorityRanker);
 
         CPU cpu = new CPU(0);
         IODevice io = new IODevice();
@@ -235,10 +235,10 @@ public class OS
 
         System.out.println("Static Priority");
 
-//        while (!Ready_Queue.isEmpty())
-//        {
-//            tempReady.add(Ready_Queue.poll());
-//        }
+        while (!Ready_Queue.isEmpty())
+        {
+            tempReady.add(Ready_Queue.poll());
+        }
 
         while (processCounter > Terminated_Queue.size())
         {
@@ -246,8 +246,15 @@ public class OS
             {
                 if (cpu.getProcess() == null) //cpu is empty - idle
                 {
-                    process = Ready_Queue.poll();
+                    process = tempReady.poll();
                     process.setState("RUNNING");
+
+                    if (!tempReady.isEmpty())
+                    {
+                        if (process.getPriority() < tempReady.peek().getPriority())
+                            cpu.setTimeSlice(tempReady.peek().getArrivalOrder());
+                    }
+
                     process.getImage().getPcb_data().setStartTime();
                     cpu.setProcess(process);
                     cpu.run();
@@ -259,6 +266,7 @@ public class OS
                         process = cpu.getProcess();
                         process.setState("TERMINATED");
                         process.getImage().getPcb_data().setEndTime();
+                        cpu.setTimeSlice(0);
                         Terminated_Queue.add(process);
                         cpu.setProcess(null);
                     }
@@ -272,11 +280,34 @@ public class OS
                             Wait_Queue.add(process);
                             cpu.setProcess(null);
                         }
+                        else if (!tempReady.isEmpty())
+                        {
+                            if (tempReady.peek().getPriority() > cpu.getProcess().getPriority())
+                            {
+                                Process temp = tempReady.poll();
+                                process = cpu.getProcess();
+                                process.setState("READY");
+                                tempReady.add(process);
+                                cpu.setProcess(temp);
+                            }
+                        }
                         else
                         {
-                            process.setState("READY");
-                            Ready_Queue.add(process);
-                            cpu.setProcess(null);
+                            if (!tempReady.isEmpty())
+                            {
+                                Process temp = tempReady.poll();
+                                process.setState("READY");
+                                tempReady.add(process);
+                                cpu.setTimeSlice(0);
+                                cpu.setProcess(temp);
+                            }
+                            else
+                            {
+                                process.updateBurst();
+                                process.setState("WAITING");
+                                Wait_Queue.add(process);
+                                cpu.setProcess(null);
+                            }
                         }
                     }
 //                    else if (cpu.getProcess().isProcessComplete()) //process is complete
@@ -303,7 +334,7 @@ public class OS
                     process.updateBurst();
                     process.setState("READY");
                     process.getImage().getPcb_data().setEndTimeIO();
-                    Ready_Queue.add(process);
+                    tempReady.add(process);
                     io.setDone();
                 }
 
