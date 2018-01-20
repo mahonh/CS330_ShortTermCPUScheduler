@@ -1,17 +1,14 @@
 public class PCB
 {
-    //To do: PCB data structure of a process
-    //for example: Process_id, Arrive_time, state, PositionOfNextInstructionToExecute(PC value)
-    //and so on
-
+    /*
+    This class is for the Process Control Block
+     */
     private int id;
     private int priority;
-    private int positionOfNextInstruction; //register value partial completion
-    //private int positionOfNextBurst; //array position
+    private int positionOfNextInstruction; //register value from CPU for partial completion
     private int arrivalOrder;
     private long startTime;
     private long endTime;
-    private long startTimeIO;
     private long endTimeIO;
     private String state;
 
@@ -22,15 +19,6 @@ public class PCB
         this.setPriority(priority);
         this.setArrivalOrder(arrivalOrder);
         setPositionOfNextInstruction(0);
-    }
-
-    public PCB(String state, int id, int priority, int nextPosition, int arrivalOrder)
-    {
-        this.setState(state);
-        this.setId(id);
-        this.setPriority(priority);
-        this.setArrivalOrder(arrivalOrder);
-        setPositionOfNextInstruction(nextPosition);
     }
 
     public int getId()
@@ -83,7 +71,7 @@ public class PCB
         this.state = state;
     }
 
-    public int getPositionOfNextInstruction()
+    public int getPositionOfNextInstruction() //acts like register value
     {
         return positionOfNextInstruction;
     }
@@ -103,16 +91,6 @@ public class PCB
         this.arrivalOrder = arrivalOrder;
     }
 
-    public long getStartTimeIO()
-    {
-        return startTimeIO;
-    }
-
-    public void setStartTimeIO()
-    {
-        this.startTimeIO = System.currentTimeMillis();
-    }
-
     public long getEndTimeIO()
     {
         return endTimeIO;
@@ -123,13 +101,13 @@ public class PCB
         this.endTimeIO = System.currentTimeMillis();
     }
 
-//    public int getPositionOfNextBurst()
-//    {
-//        return positionOfNextBurst;
-//    }
-//
-//    public void setPositionOfNextBurst(int positionOfNextBurst)
-//    {
-//        this.positionOfNextBurst = positionOfNextBurst;
-//    }
+    public long calculateTotalTime()
+    {
+        return getEndTime() - getStartTime();
+    }
+
+    public long calculateTotalIOTime()
+    {
+        return getEndTimeIO() - getStartTime();
+    }
 }

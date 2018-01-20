@@ -1,7 +1,11 @@
 public class ProcessImage
 {
+    /*
+    This class is the Image of the Process. It acts like a snapshot and contains information between the actual process
+    and the PCB
+     */
     private PCB Pcb_data;
-    private String code; //CPU_IO_Sequence
+    private String code; //Original CPU_IO_Sequence
     private int positionCounter; //Position in array
     private int[] burstData;
 
@@ -46,17 +50,9 @@ public class ProcessImage
         return getBurstData(positionCounter);
     }
 
-    public void updateBurstValue() //moves forward one
+    public void updateBurstValue() //moves forward one in burst array
     {
         positionCounter++;
-    }
-
-    public boolean isBurstCPU()
-    {
-        if (getBurstValue()%2 == 0)
-            return true;
-        else
-            return false;
     }
 
     public boolean isFinalCPUBurst()
@@ -67,14 +63,17 @@ public class ProcessImage
             return false;
     }
 
+    public boolean isFirstIOBurst()
+    {
+        if (positionCounter == 1)
+            return true;
+        else
+            return false;
+    }
+
     public void setState(String state)
     {
         getPcb_data().setState(state);
-    }
-
-    public String getState()
-    {
-        return getPcb_data().getState();
     }
 
     public int getID()

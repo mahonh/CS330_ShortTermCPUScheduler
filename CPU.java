@@ -1,20 +1,29 @@
 import java.util.Random;
 
+/*
+CPU class acts like a CPU and accepts bursts from the OS
+ */
+
 public class CPU implements Runnable
 {
     private boolean BusyOrNot;
-    public int PC; //Your CPU only has one register PC
+    private int PC; //Register for CPU
     private int done;
-    private Process process;
-    private int timeslice;
-
     private int processCount;
+    private int timeslice;
+    private long totalProcessingTime;
+    private Process process;
 
     public CPU(int settimeslice)
     {
         timeslice = settimeslice;
         BusyOrNot = false;
         done = 0;
+    }
+
+    public void run() //Thread is used for CPU so it does not interfere with Main Thread
+    {
+        execute(process);
     }
 
     private void execute(Process process)
@@ -26,19 +35,19 @@ public class CPU implements Runnable
         int cycles = 0;
         int cyclesRemaining = 0;
 
-        if (process.getRegisterValue() != 0)
-        {
+        if (process.getRegisterValue() != 0) //Checks to see what the register value is in PCB
+        {                                    //If the value is 0, it is not loaded
             PC = process.getRegisterValue();
             cycles = PC;
             if (PC - timeslice <= 0)
                 cyclesRemaining = 0;
             else
-                cyclesRemaining = PC - timeslice;
+                cyclesRemaining = PC - timeslice; //Calculates how many burst remain from register value
         }
 
         else
             {
-                if (timeslice != 0)
+                if (timeslice != 0) //Timeslice is used to simulate time and how many burst to process at a time
                     cycles = timeslice;
 
                 else
@@ -47,10 +56,9 @@ public class CPU implements Runnable
                 cyclesRemaining = process.getBurstValue() - cycles;
             }
 
-        for (int i = 0; i <= cycles; i++)
+        for (int i = 1; i < cycles; i++) //Executes BubbleSort
             BubbleSort();
 
-       // if (cyclesRemaining > 0)
         process.adjustBurst(cyclesRemaining);
 
         BusyOrNot = false;
@@ -58,18 +66,11 @@ public class CPU implements Runnable
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
 
-        //process.setProcessTime(totalTime);
+        totalProcessingTime += totalTime;
 
-        done = 1;
-        /* read the CPU burst number, say #, from the position PositionOfNextInstructionToExecute of P.
-        Repeat calling Bubble Sort() for # times and then continue.
-        If the code runs out, return (PositionOfNextInstructionToExecute, “terminated”), then OS put it back to the terminated queue.
-        If the slice of time (restricted number of calling Bubble sort() for a process each time) runs out, return
-        (PositionOfNextInstructionToExecute+1, “ready”), then OS put it back to the ready queue.
-        Otherwise, return (PositionOfNextInstructionToExecute+1, “wait”) (namely, P has an I/O request and then OS remove it from the ready queue and sent it to I/O queue)
-        */
+        processCount++;
 
-                //new Pair(0,0);
+        done = 1; //Signals CPU is done
     }
 
     private void BubbleSort()
@@ -95,6 +96,24 @@ public class CPU implements Runnable
         }
     }
 
+    public int calculateThroughput()
+    {
+        Long temp = getTotalProcessingTime() / processCount;
+        processCount = 0;
+        setTotalProcessingTime(0);
+        return temp.intValue();
+    }
+
+    public Long getTotalProcessingTime()
+    {
+        return totalProcessingTime;
+    }
+
+    public void setTotalProcessingTime(int value)
+    {
+        totalProcessingTime = value;
+    }
+
     public void setProcess(Process process)
     {
         this.process = process;
@@ -118,11 +137,5 @@ public class CPU implements Runnable
     public int isDone()
     {
         return done;
-    }
-
-    public void run()
-    {
-        execute(process);
-        processCount++;
     }
 }

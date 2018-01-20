@@ -1,5 +1,8 @@
-import java.util.ArrayList;
 import java.util.Random;
+
+/*
+IO Device class acts like an IO Device and accepts bursts from OS
+ */
 
 public class IODevice implements Runnable
 {
@@ -9,21 +12,28 @@ public class IODevice implements Runnable
 
     public IODevice()
     {
-        BusyOrNot = false;
-        done = 0;
+        setBusyOrNot(false);
+        setDone(0);
     }
 
+    public void run() //Thread is used for IO Device so it does not interfere with Main thread
+    {
+        execute(getIOBurst());
+    }
+
+    /*
+    Acts like IO Device and runs BubbleSort for set number of times
+     */
     public void execute(int IO_burst)
     {
-        BusyOrNot = true;
-        //Call Bubble Sort() for IO_burst times and then return “ready”;
+        setBusyOrNot(true);
 
-        for (int i = 0; i == IO_burst; i++)
+        for (int i = 1; i < IO_burst; i++)
             BubbleSort();
 
-        BusyOrNot = false;
+        setBusyOrNot(false);
 
-        done = 1;
+        setDone(1); //Used to signal the IO Device is complete
     }
 
     private void BubbleSort()
@@ -51,31 +61,56 @@ public class IODevice implements Runnable
 
     public int isDone()
     {
-        return done;
+        return getDone();
     }
 
     public void setDone()
     {
-        done = 0;
+        setDone(0);
     }
 
     public boolean IOisBusy()
     {
-        return BusyOrNot;
+        return isBusyOrNot();
     }
 
     public void setIOBurst(int IO_burst)
     {
-        this.IO_burst = IO_burst;
+        this.setIO_burst(IO_burst);
     }
 
     public int getIOBurst()
     {
+        return getIO_burst();
+    }
+
+    public boolean isBusyOrNot()
+    {
+        return BusyOrNot;
+    }
+
+    public void setBusyOrNot(boolean busyOrNot)
+    {
+        BusyOrNot = busyOrNot;
+    }
+
+    public int getIO_burst()
+    {
         return IO_burst;
     }
 
-    public void run()
+    public void setIO_burst(int IO_burst)
     {
-        execute(getIOBurst());
+        this.IO_burst = IO_burst;
+    }
+
+    public int getDone()
+    {
+        return done;
+    }
+
+    public void setDone(int done)
+    {
+        this.done = done;
     }
 }

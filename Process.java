@@ -1,9 +1,11 @@
 public class Process
 {
+    /*
+    This is the Process class and is at the top and communicates to the ProcessImage and PCB
+     */
     private int id;
     private int priority;
-    private int ordering;
-    private long processTime;
+    private int cpuThroughput;
     private ProcessImage image;
 
     public Process(String process)
@@ -13,7 +15,7 @@ public class Process
         setPriority(getImage().getPriority());
     }
 
-    public void adjustBurst(int remainValue) //update with timeslice
+    public void adjustBurst(int remainValue) //update with timeslice from CPU (Sets register value in PCB)
     {
         getImage().setRegisterValue(remainValue);
     }
@@ -68,16 +70,6 @@ public class Process
         this.priority = priority;
     }
 
-    public int getOrdering()
-    {
-        return ordering;
-    }
-
-    public void setOrdering(int ordering)
-    {
-        this.ordering = ordering;
-    }
-
     public ProcessImage getImage()
     {
         return image;
@@ -98,13 +90,13 @@ public class Process
         return getImage().getPcb_data().calculateTotalIOTime();
     }
 
-    public long getProcessTime()
+    public void setCPUThroughput(int value)
     {
-        return processTime;
+        cpuThroughput = value;
     }
 
-    public void setProcessTime(long processTime)  //?
+    public int getCPUThroughput()
     {
-        this.processTime = processTime;
+        return cpuThroughput;
     }
 }
